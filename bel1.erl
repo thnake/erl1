@@ -57,12 +57,41 @@ makeCodeTree(T1 , T2) -> toBeDefined.
 %  Tipp: Splitten Sie die Funktion auf:
 %  1. Funktion zum Eingliedern des Buchstabens in die Tupelliste (z.B. addLetter(...))
 %  2. Aufruf der Funktion fuer jeden Buchstaben
+%
+
+
+
+countChar([], Letter, N) -> [{Letter, N}];
+countChar([ T | Ext], Letter, N) when T =:= Letter -> countChar(Ext, Letter, N+1);
+countChar([ T | Ext], Letter, N) -> countChar(Ext, Letter, N).
+
+member(_,[])->false;
+member(X,[X|_])->true;
+member(X,[_|YS])->member(X,YS).
+
+scanText([], List, Result)-> Result;
+scanText([T|Ext], List, Result)->  case member(T, List) of
+true  -> scanText(Ext, List, Result) ;       
+false -> scanText(Ext,  List++[T], Result++countChar(Ext, T, 1))
+end.
+
+
+
+
+%f(_, Letter, N) -> f([], Letter, N).
+
+% Setze Die Liste Zusammen
+% if member -> 
+addLetter([], C, W)-> [{C, W}];
+addLetter(List, C, W) -> List ++ [{C, W}].
+
+
 
 -spec addLetter(list({char(),non_neg_integer()}), char())-> list({char(), non_neg_integer()}).
 addLetter(TupelList, Char) -> toBeDefined.
 
 -spec createFrequencies(list(char())) -> list({char(), non_neg_integer()}).
-createFrequencies(Text) -> toBeDefined.
+createFrequencies(Text) -> scanText(Text, [], []).
 
 %  Erzeugung eines Blattknotens fuer jeden Buchstaben in der Liste
 %  Aufsteigendes Sortieren der Blattknoten nach den Haeufigkeiten der Vorkommen der Buchstaben
@@ -129,4 +158,3 @@ convert(CodeTree) -> toBeDefined.
 %  Verwenden Sie dabei die erzeugte Tabelle.
 -spec encode(Text::list(char()), CodeTree::tree()) -> list(bit()).
 encode(Text, CodeTree) -> toBeDefined.
-
