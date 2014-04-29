@@ -76,14 +76,9 @@ false -> scanText(Ext,  List++[T], Result++countChar(Ext, T, 1))
 end.
 
 
-
-
-%f(_, Letter, N) -> f([], Letter, N).
-
-% Setze Die Liste Zusammen
-% if member -> 
-addLetter([], C, W)-> [{C, W}];
-addLetter(List, C, W) -> List ++ [{C, W}].
+% Setze Die Liste Zusammen 
+% addLetter([], C, W)-> [{C, W}];
+% addLetter(List, C, W) -> List ++ [{C, W}].
 
 
 
@@ -98,7 +93,12 @@ createFrequencies(Text) -> scanText(Text, [], []).
 %  z.B. aus makeOrderedLeafList([{$b,5},{$d,2},{$e,11},{$a,7}])
 % wird [#leaf{char=$d,weight=2},#leaf{char=$b,weight=5},#leaf{char=$a,weight=7},#leaf{char=$e,weight=11}]
 -spec makeOrderedLeafList(FreqList::list({char(), non_neg_integer()})) -> list(leaf()).
-makeOrderedLeafList(FeqList) -> toBeDefined.
+makeOrderedLeafList(FreqList) -> lists:keysort(3,transformToLeaf(FreqList,[])).
+
+transformToLeaf([], Acc)-> Acc;
+transformToLeaf([{C,W}|Tail], Acc)-> transformToLeaf(Tail,Acc++[#leaf{char = C, weight = W}]).
+
+
 
 %  Bei jedem Aufruf von combine sollen immer zwei Teilbaeume (egal ob fork oder leaf) zusammenfuegt werden.
 %  Der Parameter der Funktion combine ist eine aufsteigend sortierte Liste von Knoten.
@@ -119,6 +119,10 @@ makeOrderedLeafList(FeqList) -> toBeDefined.
 
 -spec combine(list(tree())) -> list(tree()).		
 combine([TreeList]) -> toBeDefined.
+
+
+
+
 
 %  Die Funktion repeatCombine soll die Funktion combine so lange aufrufen, bis nur noch ein Gesamtbaum uebrig ist.		
 -spec repeatCombine(TreeList::list(tree())) -> tree().
