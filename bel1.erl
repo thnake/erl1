@@ -1,5 +1,6 @@
 -module(bel1).
 -compile(export_all).
+
 %-export([encode/2, decode/2, createCodeTree/1]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ein Huffman Code wird durch einen Binaermaum repraesentiert.
@@ -33,6 +34,8 @@ weight(#leaf{weight=W}) -> W.
 -spec chars(tree()) -> list(char()).
 chars(#fork{chars=C}) -> C;
 chars(#leaf{char=C}) -> [C].
+
+
 
 % Erzeugung eines CodeTrees aus zwei Teilbaeumen
 % Aus Gruenden der Testbarkeit werden links die Teilbaeume mit dem alphabetisch kleinerem Wert der 
@@ -114,13 +117,14 @@ transformToLeaf([{C,W}|Tail], Acc)-> transformToLeaf(Tail,Acc++[#leaf{char = C, 
 %  Achtung: Ob die vorgefertigten Tests funktionieren, haengt davon ab, auf welcher Seite die Knoten
 %  eingefuegt werden. Die Tests sind genau dann erfolgreich, wenn Sie die Baeume so kombinieren, dass 
 %  ein Baum entsteht, der so angeordnet ist, wie im Beispiel auf dem Aufgabenblatt. Sorgen Sie dafuer,
-%  dass die Teilbaeume ebenso eingefuegt werden (erhoehter Schwierigkeitsgrad) oder schreiben Sie eigene
+%  dass die Teilbaeume ebenso eingefuegt wkeysorterden (erhoehter Schwierigkeitsgrad) oder schreiben Sie eigene
 %  Tests. 
 
 -spec combine(list(tree())) -> list(tree()).		
-combine([TreeList]) -> toBeDefined.
-
-
+combine([TreeList]) when length([TreeList]) < 2 -> TreeList;
+combine([X,Y | Rest]) -> erlang:display(Rest), [#fork{left=#leaf{char=X#leaf.char, weight=X#leaf.weight},
+                                                   right=#leaf{char=Y#leaf.char, weight=Y#leaf.weight},
+                                                    chars=[X#leaf.char,Y#leaf.char],weight=X#leaf.weight + Y#leaf.weight} | Rest].
 
 
 
@@ -130,7 +134,7 @@ repeatCombine(TreeList)-> toBeDefined.
 
 %  createCodeTree fuegt die einzelnen Teilfunktionen zusammen. Soll aus einem gegebenen Text, den Gesamtbaum erzeugen.
 -spec createCodeTree(Text::list(char())) -> tree().
-createCodeTree(Text)-> toBeDefined.
+createCodeTree(Text)-> combine(makeOrderedLeafList(createFrequencies(Text))).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
