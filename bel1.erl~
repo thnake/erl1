@@ -126,7 +126,7 @@ combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, fork)->
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
-                                                    chars=[X#fork.chars|Y#fork.chars],
+                                                    chars=[X#fork.chars,Y#fork.chars],
                                                     weight=X#fork.weight + Y#fork.weight} | Rest];
 
 
@@ -150,7 +150,7 @@ combine([X,Y | Rest]) when is_record(X, leaf),is_record(Y, leaf)  ->
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
-                                                    chars=[X#leaf.char|Y#leaf.char],
+                                                    chars=[X#leaf.char,Y#leaf.char],
                                                     weight=X#leaf.weight + Y#leaf.weight} | Rest].
 
 
