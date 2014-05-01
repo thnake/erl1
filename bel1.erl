@@ -128,7 +128,7 @@ transformToLeaf([{C,W}|Tail], Acc)-> transformToLeaf(Tail,Acc++[#leaf{char = C, 
 %combine(list(tree())) -> list(tree()).
 		
 
-
+combine([]) -> [];
 combine([TreeList]) when length([TreeList]) < 2 -> TreeList;
 combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, fork)-> lists:sort(fun bel1:compareForkLeaf/2,
                                                     [#fork{
@@ -159,7 +159,8 @@ combine([X,Y | Rest]) when is_record(X, leaf),is_record(Y, leaf)  -> lists:sort(
                                                     left=X,
                                                     right=Y,
                                                     chars=[X#leaf.char,Y#leaf.char],
-                                                    weight=X#leaf.weight + Y#leaf.weight} | Rest]).
+                                                    weight=X#leaf.weight + Y#leaf.weight} | Rest]);
+combine(Leaf) -> [Leaf].
 
 
 
@@ -181,6 +182,7 @@ compareForkLeaf(_,_) -> true.
 %  Die Funktion repeatCombine soll die Funktion combine so lange aufrufen, bis nur noch ein Gesamtbaum uebrig ist.		
 -spec repeatCombine(TreeList::list(tree())) -> tree().
 
+repeatCombine([]) -> [];
 repeatCombine(TreeList) when length(TreeList) =:= 1 -> lists:nth(1,TreeList);
 repeatCombine(TreeList) -> repeatCombine(combine(TreeList)).
 
