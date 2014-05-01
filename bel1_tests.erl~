@@ -12,6 +12,8 @@ createTree2() -> #fork{left=#fork{left=#leaf{char=$a, weight=2},right=#leaf{char
 
 
 
+createOrderedList() -> [#leaf{char=$a, weight=5},#leaf{char=$b, weight=6},#leaf{char=$c, weight=7},
+									#leaf{char=$d, weight=8},#leaf{char=$e, weight=14}].
 
 
 

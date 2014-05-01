@@ -35,6 +35,8 @@ weight(#leaf{weight=W}) -> W.
 chars(#fork{chars=C}) -> C;
 chars(#leaf{char=C}) -> [C].
 
+createOrderedList() -> [#leaf{char=$a, weight=5},#leaf{char=$b, weight=6},#leaf{char=$c, weight=7},
+									#leaf{char=$d, weight=8},#leaf{char=$e, weight=14}].
 
 
 % Erzeugung eines CodeTrees aus zwei Teilbaeumen
@@ -120,38 +122,57 @@ transformToLeaf([{C,W}|Tail], Acc)-> transformToLeaf(Tail,Acc++[#leaf{char = C, 
 %  dass die Teilbaeume ebenso eingefuegt werden (erhoehter Schwierigkeitsgrad) oder schreiben Sie eigene
 %  Tests. 
 
--spec combine(list(tree())) -> list(tree()).		
+%-spec combine(list(tree())) -> list(tree()).
+%combine(list(tree())) -> list(tree()).
+		
+
+
 combine([TreeList]) when length([TreeList]) < 2 -> TreeList;
-combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, fork)-> 
+combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, fork)-> lists:sort(fun bel1:compareForkLeaf/2,
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
-                                                    chars=[X#fork.chars|Y#fork.chars],
-                                                    weight=X#fork.weight + Y#fork.weight} | Rest];
+                                                    chars=[X#fork.chars , Y#fork.chars],
+                                                    weight=X#fork.weight + Y#fork.weight} | Rest]);
 
 
-combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, leaf)-> 
+combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, leaf)-> lists:sort(fun bel1:compareForkLeaf/2,
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
                                                     chars=X#fork.chars++[Y#leaf.char],
-                                                    weight=X#fork.weight + Y#leaf.weight} | Rest];
+                                                    weight=X#fork.weight + Y#leaf.weight} | Rest]);
 
 
-combine([X,Y | Rest]) when is_record(X, leaf),is_record(Y, fork)-> 
+combine([X,Y | Rest]) when is_record(X, leaf),is_record(Y, fork)-> lists:sort(fun bel1:compareForkLeaf/2,
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
                                                     chars=[X#leaf.char]++Y#fork.chars,
-                                                    weight=X#leaf.weight + Y#fork.weight} | Rest];
+                                                    weight=X#leaf.weight + Y#fork.weight} | Rest]);
 
 
-combine([X,Y | Rest]) when is_record(X, leaf),is_record(Y, leaf)  -> 
+combine([X,Y | Rest]) when is_record(X, leaf),is_record(Y, leaf)  -> lists:sort(fun bel1:compareForkLeaf/2,
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
-                                                    chars=[X#leaf.char|Y#leaf.char],
-                                                    weight=X#leaf.weight + Y#leaf.weight} | Rest].
+                                                    chars=[X#leaf.char,Y#leaf.char],
+                                                    weight=X#leaf.weight + Y#leaf.weight} | Rest]).
+
+
+
+compareForkLeaf(X,Y) when is_record(X, leaf),is_record(Y, leaf) -> X#leaf.weight =< Y#leaf.weight;
+compareForkLeaf(X,Y) when is_record(X, leaf),is_record(Y, fork) -> X#leaf.weight =< Y#fork.weight;
+compareForkLeaf(X,Y) when is_record(X, fork),is_record(Y, leaf) -> X#fork.weight =< Y#leaf.weight;
+compareForkLeaf(X,Y) when is_record(X, fork),is_record(Y, fork) -> X#fork.weight =< Y#fork.weight;
+compareForkLeaf(_,_) -> true.
+
+% c(bel1.erl).
+% F = bel1:createFrequencies("abc").
+% O = bel1:makeOrderedLeafList(F).c8
+% bel1:combine(O).
+
+%lists:sort(compareForkLeaf, YourList).
 
 
 
