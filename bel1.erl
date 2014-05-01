@@ -224,14 +224,13 @@ traverseTreeDecode(Leaf, Sequence) -> {Leaf#leaf.char, Sequence}.
 %  aus dem Character und der Bitsequenz.
 %  Also: convert(CodeTree)->[{Char,BitSeq},...]
 -spec convert(CodeTree::tree()) -> list({char(), list(bit())}).
-convert(CodeTree) -> traverse([], CodeTree).
+convert(CodeTree) -> lists:keysort(1, traverse([], CodeTree)).
 
 
 traverse(S, Tree) when is_record(Tree, leaf) -> {Tree#leaf.char, S};
 traverse(S, Tree) when Tree#fork.right == nil -> traverse(S++[0], Tree#fork.left);
 traverse(S, Tree) when Tree#fork.left == nil -> traverse(S++[1], Tree#fork.right);
 traverse(S, Tree) -> L = traverse(S++[0], Tree#fork.left), R = traverse(S++[1], Tree#fork.right), flatten([R,L]).
-
 
 
 flatten(X) -> lists:reverse(flatten(X,[])).
@@ -244,7 +243,22 @@ flatten([H|T],Acc) -> flatten(T,[H|Acc]).
 %  Bitsequenz generiert.
 %  Verwenden Sie dabei die erzeugte Tabelle.
 -spec encode(Text::list(char()), CodeTree::tree()) -> list(bit()).
-encode(Text, CodeTree) -> toBeDefined.
+encode(Text, CodeTree) -> flatten(encodeWorker(Text, convert(CodeTree),[])).
+
+
+encodeWorker([], _, Acc) -> Acc;
+encodeWorker([T|Ext], Dict, Acc) -> {_, Sequence} = lists:keyfind(T, 1, Dict), 
+                                    encodeWorker(Ext, Dict, [Acc|Sequence]).
+
+
+
+
+
+
+
+
+
+
 
 
 
