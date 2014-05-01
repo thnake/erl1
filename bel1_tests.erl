@@ -1,4 +1,5 @@
 -module(bel1_tests).
+-compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 -record(fork, {left, right, chars, weight}).
 -record(leaf, {char, weight}).

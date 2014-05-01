@@ -3,6 +3,7 @@
 -compile(debug_info).
 
 %-export([encode/2, decode/2, createCodeTree/1]).
+% bel1:decode(bel1_tests:exampleTree(),[1,0,0,0,0,1,1,1,1,1,1,1,0,0]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ein Huffman Code wird durch einen Binaermaum repraesentiert.
 %
@@ -199,12 +200,12 @@ decode(CodeTree, BitList) -> decodeTail(CodeTree, BitList, []).
 
 decodeTail(_, [], Acc) -> Acc;
 decodeTail(CodeTree, BitList, Acc) -> {C, Bits} = traverseTree(CodeTree, BitList),
-                                        decodeTail(CodeTree, Bits, [Acc | C]).
+                                        decodeTail(CodeTree, Bits, Acc++[C]).
 
 
-traverseTree([HT|TT], [HS|TS]) when is_record(HT, fork), HS =:= 0 -> traverseTree(TT#fork.left, TS);
-traverseTree([HT|TT], [HS|TS]) when is_record(HT, fork), HS =:= 1 -> traverseTree(TT#fork.right, TS);
-traverseTree(Leaf, [HS|TS]) -> erl:display(hs), {Leaf#leaf.char, hs}.
+traverseTreeDecode(Tree, [HS|TS]) when is_record(Tree, fork), HS =:= 0 -> traverseTreeDecode(Tree#fork.left, TS);
+traverseTreeDecode(Tree, [HS|TS]) when is_record(Tree, fork), HS =:= 1 ->     traverseTreeDecode(Tree#fork.right, TS);
+traverseTreeDecode(Leaf, Sequence) -> erlang:display(Leaf), {Leaf#leaf.char, Sequence}.
 
 
 
