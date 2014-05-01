@@ -181,7 +181,7 @@ compareForkLeaf(_,_) -> true.
 %  Die Funktion repeatCombine soll die Funktion combine so lange aufrufen, bis nur noch ein Gesamtbaum uebrig ist.		
 -spec repeatCombine(TreeList::list(tree())) -> tree().
 
-repeatCombine(TreeList) when length(TreeList) =:= 1 -> TreeList;
+repeatCombine(TreeList) when length(TreeList) =:= 1 -> lists:nth(1,TreeList);
 repeatCombine(TreeList) -> repeatCombine(combine(TreeList)).
 
 %  createCodeTree fuegt die einzelnen Teilfunktionen zusammen. Soll aus einem gegebenen Text, den Gesamtbaum erzeugen.
@@ -204,10 +204,8 @@ decodeTail(CodeTree, BitList, Acc) -> {C, Bits} = traverseTreeDecode(CodeTree, B
 
 
 traverseTreeDecode(Tree, [HS|TS]) when is_record(Tree, fork), HS =:= 0 -> traverseTreeDecode(Tree#fork.left, TS);
-traverseTreeDecode(Tree, [HS|TS]) when is_record(Tree, fork), HS =:= 1 ->     traverseTreeDecode(Tree#fork.right, TS);
-traverseTreeDecode(Leaf, Sequence) -> erlang:display(Leaf), {Leaf#leaf.char, Sequence}.
-
-
+traverseTreeDecode(Tree, [HS|TS]) when is_record(Tree, fork), HS =:= 1 -> traverseTreeDecode(Tree#fork.right, TS);
+traverseTreeDecode(Leaf, Sequence) -> {Leaf#leaf.char, Sequence}.
 
 
 
@@ -224,10 +222,34 @@ traverseTreeDecode(Leaf, Sequence) -> erlang:display(Leaf), {Leaf#leaf.char, Seq
 %  aus dem Character und der Bitsequenz.
 %  Also: convert(CodeTree)->[{Char,BitSeq},...]
 -spec convert(CodeTree::tree()) -> list({char(), list(bit())}).
-convert(CodeTree) -> toBeDefined.
+convert(CodeTree) -> traverse([], CodeTree).
+
+
+traverse(S, Tree) when is_record(Tree, leaf) -> {Tree#leaf.char, S};
+traverse(S, Tree) when Tree#fork.right == nil -> traverse(S++[0], Tree#fork.left);
+traverse(S, Tree) when Tree#fork.left == nil -> traverse(S++[1], Tree#fork.right);
+traverse(S, Tree) -> L = traverse(S++[0], Tree#fork.left), R = traverse(S++[1], Tree#fork.right), flatten([R,L]).
+
+
+
+flatten(X) -> lists:reverse(flatten(X,[])).
+flatten([],Acc) -> Acc;
+flatten([H|T],Acc) when is_list(H) -> flatten(T, flatten(H,Acc));
+flatten([H|T],Acc) -> flatten(T,[H|Acc]).                        
+
 
 %  Schreiben Sie eine Funktion encode, die aus einem Text und einem CodeTree die entsprechende 
 %  Bitsequenz generiert.
 %  Verwenden Sie dabei die erzeugte Tabelle.
 -spec encode(Text::list(char()), CodeTree::tree()) -> list(bit()).
 encode(Text, CodeTree) -> toBeDefined.
+
+
+
+
+
+
+
+
+
+
