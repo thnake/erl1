@@ -1,5 +1,6 @@
 -module(bel1).
 -compile(export_all).
+-compile(debug_info).
 
 %-export([encode/2, decode/2, createCodeTree/1]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,7 +133,7 @@ combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, fork)-> lists:sort(fu
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
-                                                    chars=[X#fork.chars, Y#fork.chars],
+                                                    chars=[X#fork.chars | Y#fork.chars],
                                                     weight=X#fork.weight + Y#fork.weight} | Rest]);
 
 
@@ -184,7 +185,7 @@ repeatCombine(TreeList) -> repeatCombine(combine(TreeList)).
 
 %  createCodeTree fuegt die einzelnen Teilfunktionen zusammen. Soll aus einem gegebenen Text, den Gesamtbaum erzeugen.
 -spec createCodeTree(Text::list(char())) -> tree().
-createCodeTree(Text)-> combine(makeOrderedLeafList(createFrequencies(Text))).
+createCodeTree(Text)-> repeatCombine(combine(makeOrderedLeafList(createFrequencies(Text)))).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -194,7 +195,20 @@ createCodeTree(Text)-> combine(makeOrderedLeafList(createFrequencies(Text))).
 % Die Funktion decode soll eine Liste von Bits mit einem gegebenen Huffman Code (CodeTree) dekodieren.
 % Ergebnis soll die Zeichenkette im Klartext sein.	
 -spec decode(CodeTree::tree(), list( bit())) -> list(char()).
-decode(CodeTree, BitList) -> toBeDefined.
+decode(CodeTree, BitList) -> decodeTail(CodeTree, BitList, []).
+
+decodeTail(_, [], Acc) -> Acc;
+decodeTail(CodeTree, BitList, Acc) -> {C, Bits} = traverseTree(CodeTree, BitList),
+                                        decodeTail(CodeTree, Bits, [Acc | C]).
+
+
+traverseTree([HT|TT], [HS|TS]) when is_record(HT, fork), HS =:= 0 -> traverseTree(TT#fork.left, TS);
+traverseTree([HT|TT], [HS|TS]) when is_record(HT, fork), HS =:= 1 -> traverseTree(TT#fork.right, TS);
+traverseTree(Leaf, [HS|TS]) -> erl:display(HS), {Leaf#leaf.char, HS}.
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
