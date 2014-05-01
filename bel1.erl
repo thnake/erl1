@@ -132,7 +132,7 @@ combine([X,Y | Rest]) when is_record(X, fork),is_record(Y, fork)-> lists:sort(fu
                                                     [#fork{
                                                     left=X,
                                                     right=Y,
-                                                    chars=[X#fork.chars , Y#fork.chars],
+                                                    chars=[X#fork.chars, Y#fork.chars],
                                                     weight=X#fork.weight + Y#fork.weight} | Rest]);
 
 
@@ -176,11 +176,11 @@ compareForkLeaf(_,_) -> true.
 
 
 
-
-
 %  Die Funktion repeatCombine soll die Funktion combine so lange aufrufen, bis nur noch ein Gesamtbaum uebrig ist.		
 -spec repeatCombine(TreeList::list(tree())) -> tree().
-repeatCombine(TreeList)-> toBeDefined.
+
+repeatCombine(TreeList) when length(TreeList) =:= 1 -> TreeList;
+repeatCombine(TreeList) -> repeatCombine(combine(TreeList)).
 
 %  createCodeTree fuegt die einzelnen Teilfunktionen zusammen. Soll aus einem gegebenen Text, den Gesamtbaum erzeugen.
 -spec createCodeTree(Text::list(char())) -> tree().
